@@ -1,9 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root{--blue:#1A3A8F;--red:#C8102E}
-@layer base{*{-webkit-tap-highlight-color:transparent}body{@apply bg-slate-50 text-slate-900 antialiased}}
-@layer components{.app-shell{@apply max-w-[430px] mx-auto min-h-screen relative bg-slate-50}.top-stripe{height:3px;background:linear-gradient(90deg,#C8102E 40%,#1A3A8F 40%)}.card{@apply bg-white border border-slate-200 rounded-2xl shadow-sm}.btn-primary{@apply bg-blue-600 text-white font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50}.btn-outline{@apply border-2 border-blue-600 text-blue-600 font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-600 hover:text-white active:scale-95}.tab-item{@apply px-4 py-3 text-sm font-semibold text-slate-400 font-display border-b-2 border-transparent cursor-pointer transition-colors hover:text-slate-700}.tab-item.active{@apply text-blue-600 border-blue-600}.avatar{@apply rounded-full flex items-center justify-center font-bold font-display flex-shrink-0}.badge{@apply text-[10px] font-bold tracking-wide uppercase px-2 py-1 rounded-md}.section-title{@apply text-xs font-bold uppercase tracking-widest text-slate-500 font-display}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.animate-in{animation:fadeIn 0.25s ease forwards}
-.pb-safe{padding-bottom:max(80px,env(safe-area-inset-bottom) + 60px)}
+
+@layer base {
+  * { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-slate-50 text-slate-900 antialiased; }
+}
+
+@layer components {
+  .app-shell { @apply max-w-[430px] mx-auto min-h-screen relative bg-slate-50; }
+  .top-stripe { height:3px; background:linear-gradient(90deg,#C8102E 40%,#1A3A8F 40%); }
+  .card { @apply bg-white border border-slate-200 rounded-2xl shadow-sm; }
+  .btn-primary { @apply bg-blue-600 text-white font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50; }
+  .btn-outline { @apply border-2 border-blue-600 text-blue-600 font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-600 hover:text-white active:scale-95; }
+  .tab-item { @apply px-4 py-3 text-sm font-semibold text-slate-400 font-display border-b-2 border-transparent cursor-pointer transition-colors hover:text-slate-700; }
+  .tab-item.active { @apply text-blue-600 border-blue-600; }
+  .avatar { @apply rounded-full flex items-center justify-center font-bold font-display flex-shrink-0; }
+  .badge { @apply text-[10px] font-bold tracking-wide uppercase px-2 py-1 rounded-md; }
+  .section-title { @apply text-xs font-bold uppercase tracking-widest text-slate-500 font-display; }
+  .animate-in { animation: fadeIn 0.25s ease forwards; }
+}
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.pb-safe { padding-bottom: max(80px, env(safe-area-inset-bottom) + 60px); }
