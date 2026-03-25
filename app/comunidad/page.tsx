@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Users, Trophy, Instagram, ExternalLink, Globe } from 'lucide-react'
 
 export default async function ComunidadPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const [{ count: players }, { count: tournaments }] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
