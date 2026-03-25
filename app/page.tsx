@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import Topbar from '@/components/layout/Topbar'
 import BottomNav from '@/components/layout/BottomNav'
-import { MOCK_TOURNAMENTS, MOCK_PLAYERS, MOCK_NEWS, STATS } from '@/lib/mock-data'
+import { MOCK_TOURNAMENTS, MOCK_PLAYERS, MOCK_NEWS } from '@/lib/mock-data'
 import { formatDate, formatCLP, STATUS_LABELS, STATUS_STYLES, cn, timeAgo, CATEGORY_STYLES, CATEGORY_LABELS, LEVEL_LABELS, avatarColor, getInitials } from '@/lib/utils'
+
 export default function HomePage() {
   const next = MOCK_TOURNAMENTS.find(t => t.status==='open') ?? MOCK_TOURNAMENTS[0]
   return (<div className="flex flex-col min-h-screen animate-in"><Topbar /><main className="flex-1 pb-24">
@@ -14,11 +15,6 @@ export default function HomePage() {
       <h1 className="font-display font-black text-3xl text-white leading-tight">{next.name}</h1>
       <p className="text-sm text-white/70 mt-2">{next.location} · {next.city}</p>
       <Link href="/torneos" className="inline-block mt-4 bg-white text-blue-700 font-display font-bold text-xs px-5 py-2.5 rounded-full shadow-md">Ver detalles →</Link>
-    </div>
-    <div className="flex gap-2.5 px-4 mt-4 overflow-x-auto pb-1">
-      {[{num:STATS.players,label:'Jugadores'},{num:STATS.tournaments_2024,label:'Torneos 2024'},{num:STATS.regions,label:'Regiones'},{num:STATS.active_tournaments,label:'Activos'}].map(s => (
-        <div key={s.label} className="card flex-shrink-0 px-5 py-4 text-center min-w-[88px]"><p className="font-display font-black text-2xl text-blue-600 leading-none">{s.num}</p><p className="text-[11px] text-slate-500 mt-1 font-medium">{s.label}</p></div>
-      ))}
     </div>
     <div className="mt-5">
       <div className="flex items-center justify-between px-4 mb-2.5"><h2 className="section-title">Últimas noticias</h2><Link href="/comunidad" className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">Ver todo <ChevronRight size={14} /></Link></div>
