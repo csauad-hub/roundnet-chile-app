@@ -16,7 +16,7 @@ const statusStyle: Record<string, { color: string; bg: string; border: string }>
 }
 
 export default async function TorneosPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: torneos } = await supabase
     .from('tournaments')
     .select('*')
