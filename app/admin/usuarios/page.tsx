@@ -10,7 +10,7 @@ interface Profile {
 }
 
 export default async function UsuariosPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // Get all profiles joined with auth users (emails)
   const { data: profiles, error } = await supabase
