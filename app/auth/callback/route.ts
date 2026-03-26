@@ -4,7 +4,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  console.log('[callback] cookies:', JSON.stringify(request.cookies.getAll().map(c => c.name)))
+
+  // Log raw Cookie header and parsed cookies as errors so they appear in Vercel logs
+  const rawCookie = request.headers.get('cookie') ?? ''
+  const parsedCookies = request.cookies.getAll().map(c => c.name)
+  console.error('[callback] raw-cookie-header:', rawCookie.substring(0, 500))
+  console.error('[callback] parsed-cookie-names:', JSON.stringify(parsedCookies))
+
   const next = searchParams.get('next') ?? '/'
 
   if (code) {
@@ -29,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) return response
-    console.error('[callback] error:', JSON.stringify(error))
+    console.error('[callback] exchange-error:', JSON.stringify(error))
   }
 
   return NextResponse.redirect(`${origin}/auth?error=auth_callback_error`)
