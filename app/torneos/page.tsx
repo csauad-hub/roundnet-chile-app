@@ -26,7 +26,7 @@ export default async function TorneosPage() {
     .order('date', { ascending: true })
 
   const upcoming = torneos?.filter(t => t.status === 'upcoming' || t.status === 'ongoing') ?? []
-  const past = torneos?.filter(t => t.status === 'finished' || t.status === 'cancelled') ?? []
+  const past = (torneos?.filter(t => t.status === 'finished' || t.status === 'cancelled') ?? []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return (
     <div className="flex flex-col min-h-screen animate-in">
