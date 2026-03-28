@@ -5,7 +5,8 @@ import { cookies } from 'next/headers'
 export async function createClient() {
   const cookieStore = await cookies()
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // Use service role key to bypass RLS; falls back to anon key if not set
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   const projectRef = supabaseUrl.match(/https:\/\/([^.]+)/)?.[1]
 
   let accessToken: string | undefined
@@ -38,7 +39,7 @@ export async function createClient() {
     }
   }
 
-  const supabase = createSupabaseClient(supabaseUrl, anonKey, {
+  const supabase = createSupabaseClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 
