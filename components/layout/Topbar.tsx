@@ -22,8 +22,9 @@ export default function Topbar({ title }: { title?: string }) {
         const name = user.user_metadata?.full_name || user.email || ''
         const parts = name.trim().split(' ')
         setInitials((parts.length > 1 ? parts[0][0] + parts[1][0] : name.slice(0, 2)).toUpperCase())
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-        setIsAdmin(profile?.role === 'admin')
+        const res = await fetch('/api/me')
+        const data = await res.json()
+        setIsAdmin(data.role === 'admin')
       }
     }
     loadUser()
