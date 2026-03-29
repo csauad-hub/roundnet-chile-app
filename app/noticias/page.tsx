@@ -1,23 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { Calendar, Newspaper } from 'lucide-react'
+import { Newspaper, ChevronRight } from 'lucide-react'
+import Topbar from '@/components/layout/Topbar'
+import BottomNav from '@/components/layout/BottomNav'
 
 type News = {
   id: string
   title: string
   description: string | null
   image_url: string | null
-  link: string | null
   published_at: string | null
   created_at: string
+  category: string | null
 }
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleDateString('es-CL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+    day: 'numeric', month: 'long', year: 'numeric',
   })
 }
 
@@ -29,7 +29,7 @@ export default async function NoticiasPage() {
 
   const { data } = await supabase
     .from('news')
-    .select('id,title,description,image_url,link,published_at,created_at')
+    .select('id,title,description,image_url,published_at,created_at,category')
     .order('created_at', { ascending: false })
 
   const news: News[] = data ?? []
@@ -37,95 +37,80 @@ export default async function NoticiasPage() {
   const rest = news.slice(1)
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0d1a' }}>
-      <div className="max-w-5xl mx-auto px-4 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Noticias</h1>
-          <p className="text-gray-400 mt-1">Lo último del roundnet en Chile</p>
-        </div>
-
-        {news.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">
-            <p>No hay noticias publicadas todavía.</p>
-          </div>
-        ) : (
-          <>
-            {featured && (
-              <Link href={`/noticias/${featured.id}`} className="block group mb-8">
-                <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:border-[#00E5FF]/30 transition-colors">
-                  {featured.image_url ? (
-                    <div className="relative h-64 md:h-80">
-                      <img
-                        src={featured.image_url}
-                        alt={featured.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d1a] via-[#0d0d1a]/20 to-transparent" />
-                    </div>
-                  ) : (
-                    <div className="h-40 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(123,47,255,0.12) 100%)' }}>
-                      <Newspaper size={40} className="text-white/20" />
-                    </div>
-                  )}
-                  <div className="p-6">
-                    <span className="text-xs font-semibold text-[#00E5FF] uppercase tracking-wider">Destacado</span>
-                    <h2 className="text-xl md:text-2xl font-bold text-white mt-2 group-hover:text-[#00E5FF] transition-colors">
-                      {featured.title}
-                    </h2>
-                    {featured.description && (
-                      <p className="text-gray-400 mt-2 line-clamp-2">{featured.description}</p>
-                    )}
-                    {featured.published_at && (
-                      <div className="flex items-center gap-1.5 text-gray-500 text-xs mt-3">
-                        <Calendar size={12} />
-                        {formatDate(featured.published_at)}
+    <div className="flex flex-col min-h-screen animate-in">
+      <Topbar title="Noticias" />
+      <main className="flex-1 pb-24 bg-slate-50">
+        <div className="px-4 pt-4 pb-6 space-y-3">
+          {news.length === 0 ? (
+            <div className="card px-4 py-12 text-center text-sm text-slate-400">
+              No hay noticias publicadas todavía.
+            </div>
+          ) : (
+            <>
+              {/* Destacado */}
+              {featured && (
+                <Link href={`/noticias/${featured.id}`} className="block group">
+                  <div className="card overflow-hidden hover:shadow-md transition-shadow">
+                    {featured.image_url ? (
+                      <div className="h-48 overflow-hidden">
+                        <img
+                          src={featured.image_url}
+                          alt={featured.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-32 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                        <Newspaper size={32} className="text-blue-200" />
                       </div>
                     )}
-                  </div>
-                </div>
-              </Link>
-            )}
-
-            {rest.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {rest.map(n => (
-                  <Link key={n.id} href={`/noticias/${n.id}`} className="group">
-                    <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:border-[#00E5FF]/30 transition-colors h-full flex flex-col">
-                      {n.image_url ? (
-                        <div className="h-40 overflow-hidden">
-                          <img
-                            src={n.image_url}
-                            alt={n.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      ) : (
-                        <div className="h-32 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(123,47,255,0.08) 100%)' }}>
-                          <Newspaper size={28} className="text-white/15" />
-                        </div>
+                    <div className="px-4 py-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Destacado</span>
+                      <h2 className="font-display font-bold text-slate-800 text-base leading-snug mt-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+                        {featured.title}
+                      </h2>
+                      {featured.description && (
+                        <p className="text-sm text-slate-500 mt-1 line-clamp-2">{featured.description}</p>
                       )}
-                      <div className="p-4 flex flex-col flex-1">
-                        <h3 className="text-white font-semibold text-sm group-hover:text-[#00E5FF] transition-colors line-clamp-2">
-                          {n.title}
-                        </h3>
-                        {n.description && (
-                          <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 flex-1">{n.description}</p>
-                        )}
-                        {n.published_at && (
-                          <div className="flex items-center gap-1 text-gray-500 text-xs mt-3">
-                            <Calendar size={11} />
-                            {formatDate(n.published_at)}
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-xs text-slate-400 mt-2">
+                        {formatDate(featured.published_at ?? featured.created_at)}
+                      </p>
                     </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Lista */}
+              {rest.map(n => (
+                <Link key={n.id} href={`/noticias/${n.id}`} className="block group">
+                  <div className="card flex gap-3 px-4 py-3.5 hover:shadow-md transition-shadow">
+                    <div className="w-16 h-16 rounded-xl flex-shrink-0 overflow-hidden bg-blue-50 flex items-center justify-center">
+                      {n.image_url ? (
+                        <img src={n.image_url} alt={n.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <Newspaper size={20} className="text-blue-200" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {n.category && (
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">{n.category}</p>
+                      )}
+                      <p className="text-sm font-semibold text-slate-800 leading-snug mt-0.5 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {n.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {formatDate(n.published_at ?? n.created_at)}
+                      </p>
+                    </div>
+                    <ChevronRight size={16} className="text-slate-300 self-center shrink-0" />
+                  </div>
+                </Link>
+              ))}
+            </>
+          )}
+        </div>
+      </main>
+      <BottomNav />
     </div>
   )
 }
