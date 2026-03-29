@@ -22,8 +22,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       if (chunks.length > 0) tokenValue = chunks.join('')
     }
     if (tokenValue) {
-      try { accessToken = JSON.parse(decodeURIComponent(tokenValue)).access_token }
-      catch { try { accessToken = JSON.parse(tokenValue).access_token } catch {} }
+      try {
+        accessToken = JSON.parse(decodeURIComponent(tokenValue)).access_token
+      } catch {
+        try { accessToken = JSON.parse(tokenValue).access_token } catch {}
+      }
     }
   }
   if (!accessToken) redirect('/auth?next=/admin')
@@ -35,51 +38,60 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const displayName = profile?.full_name || user.email || 'Admin'
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <nav className="bg-gray-900 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">R</span>
-              </div>
-              <span className="text-white font-semibold">Panel Admin</span>
-            </div>
-            <div className="flex items-center gap-6">
-              <Link href="/admin" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-              </Link>
-              <Link href="/admin/torneos" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-                <Trophy className="w-4 h-4" />
-                Torneos
-              </Link>
-              <Link href="/admin/usuarios" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-                <Users className="w-4 h-4" />
-                Usuarios
-              </Link>
-              <Link href="/admin/noticias" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-                <Newspaper className="w-4 h-4" />
-                Noticias
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/" className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 text-sm transition-colors border border-cyan-400/30 hover:border-cyan-300/50 px-3 py-1.5 rounded-lg">
-                <Home className="w-4 h-4" />
-                Ver App
-              </Link>
-              <span className="text-gray-300 text-sm">{displayName}</span>
-              <form action="/api/auth/logout" method="POST">
-                <button type="submit" className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
-                  <LogOut className="w-4 h-4" />
-                  Salir
-                </button>
-              </form>
-            </div>
+    <div className="min-h-screen bg-gray-950 flex">
+      {/* Sidebar */}
+      <aside className="w-52 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0 sticky top-0 h-screen">
+        {/* Logo */}
+        <div className="p-4 border-b border-gray-800 flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-sm">R</span>
           </div>
+          <span className="text-white font-semibold text-sm">Panel Admin</span>
         </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Nav */}
+        <nav className="flex-1 p-3 space-y-0.5">
+          <Link href="/admin" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+            <LayoutDashboard className="w-4 h-4 shrink-0" />
+            Dashboard
+          </Link>
+          <Link href="/admin/torneos" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+            <Trophy className="w-4 h-4 shrink-0" />
+            Torneos
+          </Link>
+          <Link href="/admin/usuarios" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+            <Users className="w-4 h-4 shrink-0" />
+            Usuarios
+          </Link>
+          <Link href="/admin/noticias" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+            <Newspaper className="w-4 h-4 shrink-0" />
+            Noticias
+          </Link>
+        </nav>
+
+        {/* Bottom */}
+        <div className="p-3 border-t border-gray-800 space-y-1">
+          <Link href="/" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-cyan-400 hover:text-cyan-300 hover:bg-cyan-400/5 text-sm transition-colors border border-cyan-400/20 hover:border-cyan-300/40">
+            <Home className="w-4 h-4 shrink-0" />
+            Ver App
+          </Link>
+          <div className="flex items-center gap-2.5 px-3 py-2 text-gray-400 text-sm">
+            <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs text-white font-medium shrink-0">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <span className="truncate text-xs">{displayName}</span>
+          </div>
+          <form action="/api/auth/logout" method="POST">
+            <button type="submit" className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+              <LogOut className="w-4 h-4 shrink-0" />
+              Salir
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-auto p-6 min-w-0">
         {children}
       </main>
     </div>
