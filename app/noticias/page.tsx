@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { Calendar } from 'lucide-react'
+import { Calendar, Newspaper } from 'lucide-react'
 
 type News = {
   id: string
@@ -14,7 +14,11 @@ type News = {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('es-CL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
 export default async function NoticiasPage() {
@@ -22,6 +26,7 @@ export default async function NoticiasPage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+
   const { data } = await supabase
     .from('news')
     .select('id,title,description,image_url,link,published_at,created_at')
@@ -58,7 +63,9 @@ export default async function NoticiasPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d1a] via-[#0d0d1a]/20 to-transparent" />
                     </div>
                   ) : (
-                    <div className="h-40 bg-gradient-to-br from-[#00E5FF]/10 to-[#7B2FFF]/10" />
+                    <div className="h-40 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(123,47,255,0.12) 100%)' }}>
+                      <Newspaper size={40} className="text-white/20" />
+                    </div>
                   )}
                   <div className="p-6">
                     <span className="text-xs font-semibold text-[#00E5FF] uppercase tracking-wider">Destacado</span>
@@ -93,7 +100,9 @@ export default async function NoticiasPage() {
                           />
                         </div>
                       ) : (
-                        <div className="h-28 bg-gradient-to-br from-[#00E5FF]/5 to-[#7B2FFF]/5" />
+                        <div className="h-32 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(123,47,255,0.08) 100%)' }}>
+                          <Newspaper size={28} className="text-white/15" />
+                        </div>
                       )}
                       <div className="p-4 flex flex-col flex-1">
                         <h3 className="text-white font-semibold text-sm group-hover:text-[#00E5FF] transition-colors line-clamp-2">
