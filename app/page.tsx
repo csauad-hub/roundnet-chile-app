@@ -1,10 +1,12 @@
 import Link from 'next/link'
-import { ChevronRight, Newspaper } from 'lucide-react'
+import { ChevronRight, Newspaper, ExternalLink, Trophy } from 'lucide-react'
 import Topbar from '@/components/layout/Topbar'
 import BottomNav from '@/components/layout/BottomNav'
-import { MOCK_PLAYERS } from '@/lib/mock-data'
-import { formatDate, cn, avatarColor, getInitials } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import { createClient } from '@supabase/supabase-js'
+
+// Update this URL with the actual Google Drive ranking sheet
+const RANKING_URL = 'https://drive.google.com'
 
 const PROXIMO_TORNEO = {
   name: '1° Fecha Nacional La Serena 2026',
@@ -75,28 +77,24 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Top Ranking */}
-        <div className="mt-5">
-          <div className="flex items-center justify-between px-4 mb-2.5">
-            <h2 className="section-title">Top Ranking</h2>
-            <Link href="/torneos" className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">Ver completo <ChevronRight size={14} /></Link>
-          </div>
-          <div className="px-4 flex flex-col gap-2">
-            {MOCK_PLAYERS.slice(0, 3).map((p, i) => (
-              <div key={p.id} className={cn('card flex items-center gap-3 px-4 py-3', i === 0 && 'border-yellow-300 bg-yellow-50/60', i === 1 && 'border-slate-300', i === 2 && 'border-orange-200')}>
-                <div className={cn('font-display font-black text-lg w-7 text-center', i === 0 && 'text-yellow-500', i === 1 && 'text-slate-400', i === 2 && 'text-orange-400')}>{['🥇', '🥈', '🥉'][i]}</div>
-                <div className={cn('avatar w-9 h-9 text-xs', avatarColor(p.full_name))}>{getInitials(p.full_name)}</div>
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">{p.full_name}</p>
-                  <p className="text-xs text-slate-400">{p.city}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-display font-black text-lg text-blue-600">{p.ranking_points.toLocaleString('es-CL')}</p>
-                  <p className="text-[10px] text-slate-400">puntos</p>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Ranking */}
+        <div className="mt-5 px-4">
+          <h2 className="section-title mb-2.5">Ranking</h2>
+          <a
+            href={RANKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card flex items-center gap-4 px-4 py-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0 text-2xl">
+              🏆
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-800">Ranking Nacional</p>
+              <p className="text-xs text-slate-400 mt-0.5">El ranking se actualiza externamente. Toca para ver la tabla completa.</p>
+            </div>
+            <ExternalLink size={16} className="text-slate-300 flex-shrink-0" />
+          </a>
         </div>
       </main>
       <BottomNav />
