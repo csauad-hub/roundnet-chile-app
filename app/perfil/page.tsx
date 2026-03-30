@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { User, Mail, Shield, Calendar } from 'lucide-react'
+import { Mail, Shield, Calendar, ChevronRight, LayoutDashboard } from 'lucide-react'
+import Topbar from '@/components/layout/Topbar'
+import BottomNav from '@/components/layout/BottomNav'
+import Link from 'next/link'
 
 export default async function PerfilPage() {
   const supabase = await createClient()
@@ -16,98 +19,102 @@ export default async function PerfilPage() {
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuario'
   const isAdmin = profile?.role === 'admin'
   const joinDate = new Date(user.created_at).toLocaleDateString('es-CL', {
-    year: 'numeric', month: 'long', day: 'numeric'
+    year: 'numeric', month: 'long', day: 'numeric',
   })
+  const initial = displayName.charAt(0).toUpperCase()
 
   return (
-    <div className="min-h-screen py-10 px-4" style={{ background: '#0d0d1a' }}>
-      <div className="max-w-lg mx-auto space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-white">Mi Perfil</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            Tu información de cuenta en Roundnet Chile
-          </p>
-        </div>
+    <div className="flex flex-col min-h-screen animate-in">
+      <Topbar title="Mi Perfil" />
+      <main className="flex-1 pb-24 bg-slate-50">
 
-        {/* Avatar + name card */}
-        <div className="rounded-2xl p-6 border flex items-center gap-5" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)' }}>
-          {profile?.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={displayName}
-              className="w-16 h-16 rounded-full object-cover ring-2"
-              style={{ ringColor: '#00E5FF' }}
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold" style={{ background: 'linear-gradient(135deg, #00E5FF22, #7B2FFF22)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
-              {displayName.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <div>
-            <h2 className="text-lg font-semibold text-white">{displayName}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              {isAdmin ? (
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }}>
-                  Admin
-                </span>
-              ) : (
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  Usuario
-                </span>
-              )}
+        {/* Avatar card */}
+        <section className="px-4 mt-4">
+          <div className="card p-5 flex items-center gap-4">
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={displayName}
+                className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-100"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-black flex-shrink-0">
+                {initial}
+              </div>
+            )}
+            <div>
+              <h2 className="font-display font-black text-lg text-slate-800">{displayName}</h2>
+              <span className={
+                isAdmin
+                  ? 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200'
+              }>
+                {isAdmin ? 'Admin' : 'Usuario'}
+              </span>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Info rows */}
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center gap-4 px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <Mail size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
-            <div>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Correo</p>
-              <p className="text-sm text-white">{user.email}</p>
+        <section className="px-4 mt-4">
+          <div className="card divide-y divide-slate-100">
+            <div className="flex items-center gap-4 px-5 py-4">
+              <Mail size={16} className="text-slate-400 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-slate-400">Correo</p>
+                <p className="text-sm font-medium text-slate-800 truncate">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 px-5 py-4">
+              <Shield size={16} className="text-slate-400 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs text-slate-400">Rol</p>
+                <p className="text-sm font-medium text-slate-800 capitalize">{profile?.role || 'usuario'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 px-5 py-4">
+              <Calendar size={16} className="text-slate-400 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs text-slate-400">Miembro desde</p>
+                <p className="text-sm font-medium text-slate-800">{joinDate}</p>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="flex items-center gap-4 px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <Shield size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
-            <div>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Rol</p>
-              <p className="text-sm text-white capitalize">{profile?.role || 'usuario'}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 px-5 py-4">
-            <Calendar size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
-            <div>
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Miembro desde</p>
-              <p className="text-sm text-white">{joinDate}</p>
-            </div>
-          </div>
-        </div>
+        {/* Admin link */}
+        {isAdmin && (
+          <section className="px-4 mt-4">
+            <Link
+              href="/admin"
+              className="card flex items-center gap-4 px-5 py-4"
+            >
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <LayoutDashboard size={18} className="text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-slate-800">Panel de administración</p>
+                <p className="text-xs text-slate-400">Gestionar torneos, noticias y usuarios</p>
+              </div>
+              <ChevronRight size={16} className="text-slate-300" />
+            </Link>
+          </section>
+        )}
 
         {/* Sign out */}
-        <form action="/auth/signout" method="post">
-          <button
-            type="submit"
-            className="w-full py-3 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-            style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}
-          >
-            Cerrar sesión
-          </button>
-        </form>
+        <section className="px-4 mt-4">
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="w-full py-3 rounded-2xl text-sm font-semibold text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-colors"
+            >
+              Cerrar sesión
+            </button>
+          </form>
+        </section>
 
-        {isAdmin && (
-          <a
-            href="/admin"
-            className="block w-full py-3 rounded-xl text-sm font-medium text-center transition-all hover:opacity-80"
-            style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}
-          >
-            Ir al Panel Admin →
-          </a>
-        )}
-      </div>
+      </main>
+      <BottomNav />
     </div>
   )
 }
