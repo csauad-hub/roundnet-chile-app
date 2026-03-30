@@ -4,6 +4,7 @@ import { Mail, Shield, Calendar, ChevronRight, LayoutDashboard } from 'lucide-re
 import Topbar from '@/components/layout/Topbar'
 import BottomNav from '@/components/layout/BottomNav'
 import Link from 'next/link'
+import PlayerProfileForm from './PlayerProfileForm'
 
 export default async function PerfilPage() {
   const supabase = await createClient()
@@ -19,7 +20,9 @@ export default async function PerfilPage() {
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuario'
   const isAdmin = profile?.role === 'admin'
   const joinDate = new Date(user.created_at).toLocaleDateString('es-CL', {
-    year: 'numeric', month: 'long', day: 'numeric',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   })
   const initial = displayName.charAt(0).toUpperCase()
 
@@ -27,7 +30,6 @@ export default async function PerfilPage() {
     <div className="flex flex-col min-h-screen animate-in">
       <Topbar title="Mi Perfil" />
       <main className="flex-1 pb-24 bg-slate-50">
-
         {/* Avatar card */}
         <section className="px-4 mt-4">
           <div className="card p-5 flex items-center gap-4">
@@ -82,6 +84,15 @@ export default async function PerfilPage() {
           </div>
         </section>
 
+        {/* Player profile form */}
+        <PlayerProfileForm profile={{
+          id: user.id,
+          city: profile?.city || null,
+          instagram: profile?.instagram || null,
+          phone: profile?.phone || null,
+          visible_in_directory: profile?.visible_in_directory ?? false,
+        }} />
+
         {/* Admin link */}
         {isAdmin && (
           <section className="px-4 mt-4">
@@ -112,7 +123,6 @@ export default async function PerfilPage() {
             </button>
           </form>
         </section>
-
       </main>
       <BottomNav />
     </div>
