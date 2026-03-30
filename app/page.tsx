@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { ChevronRight, Newspaper, ExternalLink, Trophy } from 'lucide-react'
 import Topbar from '@/components/layout/Topbar'
