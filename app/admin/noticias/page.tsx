@@ -45,7 +45,7 @@ export default function AdminNoticias() {
         </div>
         <Link
           href="/admin/noticias/nuevo"
-          className="flex items-center gap-2 bg-[#00E5FF]/20 text-[#00E5FF]/40 px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#00E5FF]/30 transition-colors"
+          className="flex items-center gap-2 bg-[#00E5FF]/20 text-[#00E5FF] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#00E5FF]/30 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nueva Noticia
@@ -107,6 +107,13 @@ export default function AdminNoticias() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/noticias/editar/${item.id}`}
+                        className="p-1.5 text-gray-500 hover:text-[#00E5FF] transition-colors rounded"
+                        title="Editar"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
                         className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded"
