@@ -3,13 +3,30 @@
 @tailwind utilities;
 
 @layer base {
-  * { -webkit-tap-highlight-color: transparent; }
-  body { @apply bg-slate-50 text-slate-900 antialiased; }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
 }
 
 @layer components {
-  .app-shell { @apply max-w-[430px] mx-auto min-h-screen relative bg-slate-50; }
-  .top-stripe { height:3px; background:linear-gradient(90deg,#C8102E 40%,#1A3A8F 40%); }
+  .app-shell {
+    @apply max-w-[430px] mx-auto relative bg-slate-50;
+    /* height: 100dvh keeps the shell exactly the visible viewport — the body never scrolls.
+       overflow: hidden clips anything that would escape the shell bounds.
+       flex-col lets the page wrapper (> div) fill the remaining height via flex:1. */
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .top-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, #C8102E 40%, #1A3A8F 40%);
+  }
   .card { @apply bg-white border border-slate-200 rounded-2xl shadow-sm; }
   .btn-primary { @apply bg-blue-600 text-white font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50; }
   .btn-outline { @apply border-2 border-blue-600 text-blue-600 font-display font-bold rounded-xl py-3 px-6 text-sm tracking-wide transition-all hover:bg-blue-600 hover:text-white active:scale-95; }
@@ -21,24 +38,37 @@
   .animate-in { animation: fadeIn 0.25s ease forwards; }
 }
 
-/* FIX 1: remove transform from final keyframe so it does NOT create a CSS
-   stacking context. Without this fix, ancestors with .animate-in become the
-   containing block for position:fixed children (BottomNav), so the nav is
-   positioned relative to the page div and not the viewport. */
+/* FIX 1: remove transform from final keyframe so it does NOT create a CSS stacking context.
+   Without this fix, ancestors with .animate-in become the containing block for position:fixed
+   children (BottomNav), so the nav is positioned relative to the page div instead of the viewport. */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: none; }
 }
 
-/* FIX 2: pb-safe should only cover the device safe-area inset (iPhone home
-   bar). The old value of max(80px,...) made the BottomNav ~148px tall. */
+/* FIX 2: pb-safe should only cover the device safe-area inset (iPhone home bar).
+   The old value of max(80px,...) made the BottomNav ~148px tall. */
 .pb-safe {
   padding-bottom: max(4px, env(safe-area-inset-bottom));
 }
 
-/* FIX 3: Guarantee every page main has enough clearance so content is never
-   hidden behind the fixed BottomNav. Higher specificity than Tailwind pb-*
-   utilities so it wins globally without needing !important. */
+/* APP SHELL SCROLL CONTAINMENT
+   The direct child div of app-shell (each page outer wrapper) fills the shell
+   as a flex column. The Topbar stays at top, BottomNav (fixed) stays at bottom,
+   and ONLY the <main> element scrolls — neither bar ever moves.
+   min-height: 0 is required on flex children so they can shrink below content size. */
+.app-shell > div {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .app-shell main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* momentum scroll on iOS Safari */
+  overscroll-behavior-y: contain;   /* prevent bounce from propagating to body */
   padding-bottom: max(100px, env(safe-area-inset-bottom) + 80px);
 }
