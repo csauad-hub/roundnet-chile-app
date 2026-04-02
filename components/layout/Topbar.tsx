@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bell, LogIn, ShieldCheck, Plus, Trophy, Newspaper } from 'lucide-react'
+import { LogIn, ShieldCheck, Plus, Trophy, Newspaper } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
@@ -28,6 +28,7 @@ export default function Topbar({ title }: { title?: string }) {
       }
     }
     loadUser()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null)
       if (!session?.user) { setInitials('?'); setIsAdmin(false) }
@@ -56,6 +57,7 @@ export default function Topbar({ title }: { title?: string }) {
               {title ? <span className="text-slate-800">{title}</span> : <><span className="text-blue-600">Roundnet</span> <span className="text-red-500">Chile</span></>}
             </div>
           </Link>
+
           <div className="flex items-center gap-3">
             {isAdmin && (
               <>
@@ -72,18 +74,10 @@ export default function Topbar({ title }: { title?: string }) {
                   {showCreateMenu && (
                     <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 min-w-[170px] z-50">
                       <p className="px-4 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">Crear nuevo</p>
-                      <Link
-                        href="/admin/torneos/nuevo"
-                        onClick={() => setShowCreateMenu(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 font-medium"
-                      >
+                      <Link href="/admin/torneos/nuevo" onClick={() => setShowCreateMenu(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 font-medium">
                         <Trophy size={15} className="text-blue-500" /> Torneo
                       </Link>
-                      <Link
-                        href="/admin/noticias/nueva"
-                        onClick={() => setShowCreateMenu(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 font-medium"
-                      >
+                      <Link href="/admin/noticias/nueva" onClick={() => setShowCreateMenu(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 font-medium">
                         <Newspaper size={15} className="text-blue-500" /> Noticia
                       </Link>
                     </div>
@@ -91,10 +85,7 @@ export default function Topbar({ title }: { title?: string }) {
                 </div>
               </>
             )}
-            <button className="relative">
-              <Bell size={22} className="text-slate-500" strokeWidth={1.8} />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-            </button>
+
             {user ? (
               <Link href="/perfil" className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold font-display">
                 {initials}
