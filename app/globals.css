@@ -21,5 +21,24 @@
   .animate-in { animation: fadeIn 0.25s ease forwards; }
 }
 
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-.pb-safe { padding-bottom: max(80px, env(safe-area-inset-bottom) + 60px); }
+/* FIX 1: remove transform from final keyframe so it does NOT create a CSS
+   stacking context. Without this fix, ancestors with .animate-in become the
+   containing block for position:fixed children (BottomNav), so the nav is
+   positioned relative to the page div and not the viewport. */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* FIX 2: pb-safe should only cover the device safe-area inset (iPhone home
+   bar). The old value of max(80px,...) made the BottomNav ~148px tall. */
+.pb-safe {
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+}
+
+/* FIX 3: Guarantee every page main has enough clearance so content is never
+   hidden behind the fixed BottomNav. Higher specificity than Tailwind pb-*
+   utilities so it wins globally without needing !important. */
+.app-shell main {
+  padding-bottom: max(100px, env(safe-area-inset-bottom) + 80px);
+}
