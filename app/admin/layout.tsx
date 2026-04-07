@@ -43,7 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (profile?.role !== 'admin') redirect('/')
   const displayName = profile?.full_name || user.email || 'Admin'
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 100 }} className="bg-gray-950 flex">
+    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 100, flexDirection: 'row' }} className="bg-gray-950 flex">
       <aside className="w-52 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0 h-full">
         <div className="p-4 border-b border-gray-800 flex items-center gap-2.5">
           <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
