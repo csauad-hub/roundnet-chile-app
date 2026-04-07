@@ -8,12 +8,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const cookieStore = await cookies()
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const projectRef = supabaseUrl.match(/https:\/\/([^.]+)/)?.[1]
-
   let accessToken: string | undefined
-
   if (projectRef) {
     const baseName = `sb-${projectRef}-auth-token`
-
     let tokenValue = cookieStore.get(baseName)?.value
     if (!tokenValue) {
       const chunks: string[] = []
@@ -24,14 +21,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       }
       if (chunks.length > 0) tokenValue = chunks.join('')
     }
-
     if (tokenValue) {
       try {
-        // Fix: handle base64- prefix used by @supabase/ssr v0.5+
         let decoded = decodeURIComponent(tokenValue)
-        if (decoded.startsWith('base64-')) {
-          decoded = atob(decoded.slice(7))
-        }
+        if (decoded.startsWith('base64-')) decoded = atob(decoded.slice(7))
         accessToken = JSON.parse(decoded).access_token
       } catch {
         try {
@@ -42,23 +35,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       }
     }
   }
-
   if (!accessToken) redirect('/auth?next=/admin')
-
   const admin = createAdminClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { data: { user } } = await admin.auth.getUser(accessToken)
   if (!user) redirect('/auth?next=/admin')
-
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .single()
-
+  const { data: profile } = await admin.from('profiles').select('role, full_name').eq('id', user.id).single()
   if (profile?.role !== 'admin') redirect('/')
-
   const displayName = profile?.full_name || user.email || 'Admin'
-
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 100 }} className="bg-gray-950 flex">
       <aside className="w-52 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0 h-full">
