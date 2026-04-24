@@ -87,7 +87,9 @@ export default async function PerfilPage() {
         {/* Player profile form */}
         <PlayerProfileForm profile={{
           id: user.id,
+          full_name: profile?.full_name || null,
           city: profile?.city || null,
+          region: profile?.region || null,
           instagram: profile?.instagram || null,
           phone: profile?.phone || null,
           visible_in_directory: profile?.visible_in_directory ?? false,

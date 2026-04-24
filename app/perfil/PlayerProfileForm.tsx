@@ -1,17 +1,25 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Instagram, Phone, MapPin, Eye, EyeOff, Save } from 'lucide-react'
+import { Instagram, Phone, MapPin, Eye, EyeOff, Save, User } from 'lucide-react'
 
 type Props = {
   profile: {
     id: string
+    full_name: string | null
     city: string | null
+    region: string | null
     instagram: string | null
     phone: string | null
     visible_in_directory: boolean
   }
 }
+
+const REGIONS = [
+  'Arica y Parinacota', 'Tarapacá', 'Antofagasta', 'Atacama', 'Coquimbo',
+  'Valparaíso', 'Metropolitana', 'O\'Higgins', 'Maule', 'Ñuble',
+  'Biobío', 'Araucanía', 'Los Ríos', 'Los Lagos', 'Aysén', 'Magallanes',
+]
 
 export default function PlayerProfileForm({ profile }: Props) {
   const supabase = createClient()
@@ -19,7 +27,9 @@ export default function PlayerProfileForm({ profile }: Props) {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
+    full_name: profile.full_name || '',
     city: profile.city || '',
+    region: profile.region || '',
     instagram: profile.instagram || '',
     phone: profile.phone || '',
     visible_in_directory: profile.visible_in_directory ?? false,
@@ -31,7 +41,9 @@ export default function PlayerProfileForm({ profile }: Props) {
     const { error: err } = await supabase
       .from('profiles')
       .update({
+        full_name: form.full_name || null,
         city: form.city || null,
+        region: form.region || null,
         instagram: form.instagram?.replace('@', '') || null,
         phone: form.phone || null,
         visible_in_directory: form.visible_in_directory,
@@ -49,43 +61,54 @@ export default function PlayerProfileForm({ profile }: Props) {
   return (
     <section className="px-4 mt-4">
       <div className="card p-5">
-        <h3 className="font-display font-black text-slate-800 mb-1">Perfil de jugador</h3>
+        <h3 className="font-display font-black text-slate-800 mb-1">Editar perfil</h3>
         <p className="text-xs text-slate-400 mb-4">
           Esta información es opcional y controla cómo apareces en el directorio de jugadores.
         </p>
 
-        {/* Visibility toggle */}
-        <button
-          onClick={() => setForm(f => ({ ...f, visible_in_directory: !f.visible_in_directory }))}
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border mb-4 transition-colors ${
-            form.visible_in_directory
-              ? 'bg-blue-50 border-blue-200 text-blue-700'
-              : 'bg-slate-50 border-slate-200 text-slate-500'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {form.visible_in_directory ? <Eye size={16} /> : <EyeOff size={16} />}
-            <span className="text-sm font-semibold">
-              {form.visible_in_directory ? 'Visible en el directorio' : 'No visible en el directorio'}
-            </span>
-          </div>
-          <div className={`w-10 h-5 rounded-full transition-colors ${form.visible_in_directory ? 'bg-blue-600' : 'bg-slate-300'}`}>
-            <div className={`w-4 h-4 mt-0.5 rounded-full bg-white shadow transition-transform ${form.visible_in_directory ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
-          </div>
-        </button>
-
-        {/* City */}
+        {/* Nombre */}
         <div className="mb-3">
           <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-1">
-            <MapPin size={12} /> Ciudad / Región
+            <User size={12} /> Nombre completo
+          </label>
+          <input
+            type="text"
+            value={form.full_name}
+            onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+            placeholder="Tu nombre"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+
+        {/* Ciudad */}
+        <div className="mb-3">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-1">
+            <MapPin size={12} /> Ciudad
           </label>
           <input
             type="text"
             value={form.city}
             onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
-            placeholder="Ej: Santiago, Región Metropolitana"
+            placeholder="Ej: Santiago"
             className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+        </div>
+
+        {/* Región */}
+        <div className="mb-3">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-1">
+            <MapPin size={12} /> Región
+          </label>
+          <select
+            value={form.region}
+            onChange={e => setForm(f => ({ ...f, region: e.target.value }))}
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">Selecciona tu región</option>
+            {REGIONS.map(r => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
         </div>
 
         {/* Instagram */}
@@ -102,7 +125,7 @@ export default function PlayerProfileForm({ profile }: Props) {
           />
         </div>
 
-        {/* Phone */}
+        {/* Teléfono */}
         <div className="mb-4">
           <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-1">
             <Phone size={12} /> Teléfono / WhatsApp
@@ -116,9 +139,30 @@ export default function PlayerProfileForm({ profile }: Props) {
           />
         </div>
 
-        {error && (
-          <p className="text-xs text-red-500 mb-3">{error}</p>
-        )}
+        {/* Visible en directorio */}
+        <button
+          onClick={() => setForm(f => ({ ...f, visible_in_directory: !f.visible_in_directory }))}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border mb-4 transition-colors ${
+            form.visible_in_directory
+              ? 'bg-blue-50 border-blue-200 text-blue-700'
+              : 'bg-slate-50 border-slate-200 text-slate-500'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {form.visible_in_directory ? <Eye size={16} /> : <EyeOff size={16} />}
+            <div className="text-left">
+              <p className="text-sm font-semibold">
+                {form.visible_in_directory ? 'Visible en el directorio' : 'No visible en el directorio'}
+              </p>
+              <p className="text-xs opacity-70">Aparece en la sección Jugadores</p>
+            </div>
+          </div>
+          <div className={`w-10 h-5 rounded-full flex-shrink-0 transition-colors ${form.visible_in_directory ? 'bg-blue-600' : 'bg-slate-300'}`}>
+            <div className={`w-4 h-4 mt-0.5 rounded-full bg-white shadow transition-transform ${form.visible_in_directory ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
+          </div>
+        </button>
+
+        {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
 
         <button
           onClick={handleSave}
