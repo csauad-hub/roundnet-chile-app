@@ -32,3 +32,40 @@ export const MOCK_ENCUENTROS: Encuentro[] = [
   { id:'3', title:'Pickup Weekend – Ñuñoa', location:'Estadio Ñuñoa', city:'Santiago', date:new Date(Date.now()+3*86400000).toISOString(), time:'09:30', organizer_id:'7', organizer:MOCK_PLAYERS[6], participants:[MOCK_PLAYERS[6],MOCK_PLAYERS[7],MOCK_PLAYERS[0],MOCK_PLAYERS[1]], max_participants:12, created_at:new Date().toISOString() },
 ]
 export const STATS = { players:847, tournaments_2024:24, regions:12, active_tournaments:3 }
+
+export const MOCK_NEWS_DB = [
+  { id:'1', title:'Convocatoria para el Campeonato Sudamericano 2025', description:'La Federación Chilena de Roundnet ha abierto el proceso de selección para representar a Chile en el Campeonato Sudamericano 2025. Los jugadores interesados pueden postular hasta el 15 de abril.', image_url:null, link:null, published_at:'2025-03-20', created_at:'2025-03-20', category:'Selección Chile' },
+  { id:'2', title:'Resultados completos Open Valparaíso 2025', description:'Felipe Díaz y Andrea Muñoz se coronaron campeones del Open Valparaíso 2025 tras derrotar en la final a González / Rojas con un marcador de 21-18 y 21-15. El torneo contó con 48 equipos de todo el país.', image_url:null, link:null, published_at:'2025-03-16', created_at:'2025-03-16', category:'Resultados' },
+  { id:'3', title:'Actualización reglas de juego 2025', description:'La World Spikeball Roundnet Association (WSRS) publicó los cambios en las reglas oficiales para la temporada 2025. Entre las modificaciones destacan ajustes en el servicio y las faltas de red.', image_url:null, link:null, published_at:'2025-03-05', created_at:'2025-03-05', category:'Reglamento' },
+  { id:'4', title:'Open Santiago 2025 ya tiene fecha confirmada', description:'El torneo más grande de la temporada se realizará el 12 de abril en el Parque Araucano, Las Condes. Se esperan más de 60 equipos participantes de todas las regiones del país.', image_url:null, link:null, published_at:'2025-02-28', created_at:'2025-02-28', category:'Torneos' },
+]
+
+export const MOCK_TOURNAMENTS_DB = [
+  { id:'1', name:'Open Santiago 2025', location:'Parque Araucano', city:'Las Condes', date:'2025-04-12', status:'upcoming', category:'Open & Mixto', max_teams:64, price_per_team:15000, description:'El torneo más grande de la temporada en Santiago. Abierto a todas las categorías.', fwango_url:null },
+  { id:'2', name:'Challenge Viña del Mar', location:'Playa de Viña del Mar', city:'Viña del Mar', date:'2025-05-03', status:'upcoming', category:'Open', max_teams:48, price_per_team:12000, description:null, fwango_url:null },
+  { id:'3', name:'Open Concepción 2025', location:'Parque Ecuador', city:'Concepción', date:'2025-06-20', status:'upcoming', category:'Open', max_teams:32, price_per_team:10000, description:null, fwango_url:null },
+  { id:'4', name:'Open Valparaíso 2025', location:'Parque Italia', city:'Valparaíso', date:'2025-03-15', status:'finished', category:'Open & Mixto', max_teams:48, price_per_team:13000, description:null, fwango_url:null },
+  { id:'5', name:'Open Santiago 2024', location:'Parque Araucano', city:'Las Condes', date:'2024-11-10', status:'finished', category:'Open & Mixto', max_teams:64, price_per_team:14000, description:null, fwango_url:null },
+]
+
+export const MOCK_RANKING_DB = [
+  { id:'1', position:1, name:'Felipe Díaz', points:2840, season:2025, category:'Varones' },
+  { id:'2', position:2, name:'Bastián González', points:2190, season:2025, category:'Varones' },
+  { id:'3', position:3, name:'Javier Morales', points:1840, season:2025, category:'Varones' },
+  { id:'4', position:4, name:'Rodrigo Leiva', points:980, season:2025, category:'Varones' },
+  { id:'5', position:1, name:'Andrea Muñoz', points:2610, season:2025, category:'Damas' },
+  { id:'6', position:2, name:'Camila Rojas', points:2390, season:2025, category:'Damas' },
+  { id:'7', position:3, name:'Valentina Silva', points:1980, season:2025, category:'Damas' },
+  { id:'8', position:4, name:'Paula Contreras', points:1760, season:2025, category:'Damas' },
+]
+
+export const MOCK_PROFILES_DB = [
+  { id:'1', full_name:'Felipe Díaz', avatar_url:null, city:'Santiago', region:'Metropolitana', instagram:'@felipediaz', phone:null, visible_in_directory:true },
+  { id:'2', full_name:'Andrea Muñoz', avatar_url:null, city:'Valparaíso', region:'Valparaíso', instagram:'@andrea.m', phone:'+56 9 1234 5678', visible_in_directory:true },
+  { id:'3', full_name:'Camila Rojas', avatar_url:null, city:'Concepción', region:'Biobío', instagram:'@camirojas', phone:null, visible_in_directory:true },
+  { id:'4', full_name:'Bastián González', avatar_url:null, city:'Santiago', region:'Metropolitana', instagram:null, phone:'+56 9 8765 4321', visible_in_directory:true },
+  { id:'5', full_name:'Valentina Silva', avatar_url:null, city:'Temuco', region:'Araucanía', instagram:'@valesiilva', phone:null, visible_in_directory:true },
+  { id:'6', full_name:'Javier Morales', avatar_url:null, city:'Antofagasta', region:'Antofagasta', instagram:'@javierr', phone:null, visible_in_directory:true },
+  { id:'7', full_name:'Paula Contreras', avatar_url:null, city:'Santiago', region:'Metropolitana', instagram:null, phone:null, visible_in_directory:true },
+  { id:'8', full_name:'Rodrigo Leiva', avatar_url:null, city:'La Serena', region:'Coquimbo', instagram:'@rleiva', phone:'+56 9 5555 5555', visible_in_directory:true },
+]
