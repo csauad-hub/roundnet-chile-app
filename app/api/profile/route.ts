@@ -20,43 +20,55 @@ export async function PATCH(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-  const body = await request.json() as {
-    full_name?: string | null
-    city?: string | null
-    region?: string | null
-    instagram?: string | null
-    phone?: string | null
-    visible_in_directory?: boolean
+  let body: Record<string, unknown>
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
+
+  const isVisible = body.visible_in_directory === true
 
   const admin = createAdminClient()
 
-  const payload = {
-    full_name: body.full_name || null,
-    city: body.city || null,
-    region: body.region || null,
-    instagram: body.instagram ? body.instagram.replace('@', '') : null,
-    phone: body.phone || null,
-    visible_in_directory: body.visible_in_directory === true,
-    updated_at: new Date().toISOString(),
-  }
-
-  // Try UPDATE first
-  const { data: updated, error: updateError } = await admin
+  // Step 1: update
+  const { error: updateError } = await admin
     .from('profiles')
-    .update(payload)
+    .update({
+      full_name: (body.full_name as string) || null,
+      city: (body.city as string) || null,
+      region: (body.region as string) || null,
+      instagram: body.instagram ? (body.instagram as string).replace('@', '') : null,
+      phone: (body.phone as string) || null,
+      visible_in_directory: isVisible,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', user.id)
-    .select('id, full_name, visible_in_directory')
 
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  // If no row existed yet, INSERT it
-  if (!updated || updated.length === 0) {
+  // Step 2: read back what is ACTUALLY in the DB now
+  const { data: verified, error: readError } = await admin
+    .from('profiles')
+    .select('id, full_name, visible_in_directory')
+    .eq('id', user.id)
+    .single()
+
+  if (readError || !verified) {
+    // Profile row doesn't exist — create it
     const { data: inserted, error: insertError } = await admin
       .from('profiles')
-      .insert({ id: user.id, ...payload })
+      .insert({
+        id: user.id,
+        full_name: (body.full_name as string) || null,
+        city: (body.city as string) || null,
+        region: (body.region as string) || null,
+        instagram: body.instagram ? (body.instagram as string).replace('@', '') : null,
+        phone: (body.phone as string) || null,
+        visible_in_directory: isVisible,
+      })
       .select('id, full_name, visible_in_directory')
       .single()
 
@@ -67,5 +79,5 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true, saved: inserted })
   }
 
-  return NextResponse.json({ ok: true, saved: updated[0] })
+  return NextResponse.json({ ok: true, saved: verified })
 }
