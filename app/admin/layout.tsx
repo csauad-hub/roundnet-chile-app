@@ -2,7 +2,8 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { LayoutDashboard, Trophy, Users, Newspaper, LogOut, Home } from 'lucide-react'
+import { LayoutDashboard, Trophy, Users, Newspaper, LogOut, Home, MessageSquare } from 'lucide-react'
+import { createAdminClient as createAdmin } from '@/lib/supabase/admin'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
@@ -42,6 +43,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: profile } = await admin.from('profiles').select('role, full_name').eq('id', user.id).single()
   if (profile?.role !== 'admin') redirect('/')
   const displayName = profile?.full_name || user.email || 'Admin'
+  const db = createAdmin()
+  const { count: pendingPosts } = await db.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'pending')
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 100, flexDirection: 'row' }} className="bg-gray-950 flex">
       <aside className="w-52 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0 h-full">
@@ -63,6 +66,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <Link href="/admin/noticias" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
             <Newspaper className="w-4 h-4 shrink-0" /> Noticias
+          </Link>
+          <Link href="/admin/comunidad" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-colors">
+            <MessageSquare className="w-4 h-4 shrink-0" />
+            <span className="flex-1">Comunidad</span>
+            {!!pendingPosts && pendingPosts > 0 && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-white leading-none">
+                {pendingPosts}
+              </span>
+            )}
           </Link>
         </nav>
         <div className="p-3 border-t border-gray-800 space-y-1">

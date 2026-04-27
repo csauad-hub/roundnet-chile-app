@@ -79,6 +79,7 @@ export default function BlogFeed() {
   const supabase = createClient()
 
   const [posts, setPosts] = useState<Post[]>([])
+  const [myPending, setMyPending] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
   const [showNewPost, setShowNewPost] = useState(false)
@@ -101,29 +102,57 @@ export default function BlogFeed() {
 
   const fetchPosts = async (uid: string | null) => {
     setLoading(true)
-    const { data } = await supabase
-      .from('posts')
-      .select('id, author_id, category, content, likes_count, comments_count, created_at, author:profiles!author_id(full_name, avatar_url)')
-      .order('created_at', { ascending: false })
-      .limit(50)
 
-    if (!data) { setLoading(false); return }
+    const queries: Promise<unknown>[] = [
+      supabase
+        .from('posts')
+        .select('id, author_id, category, content, likes_count, comments_count, created_at, author:profiles!author_id(full_name, avatar_url)')
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(50),
+    ]
+
+    if (uid) {
+      queries.push(
+        supabase
+          .from('posts')
+          .select('id, author_id, category, content, likes_count, comments_count, created_at, author:profiles!author_id(full_name, avatar_url)')
+          .eq('status', 'pending')
+          .eq('author_id', uid)
+          .order('created_at', { ascending: false })
+      )
+    }
+
+    const [approvedRes, pendingRes] = await Promise.all(queries) as [
+      { data: Record<string, unknown>[] | null },
+      { data: Record<string, unknown>[] | null } | undefined,
+    ]
+
+    const approved = approvedRes.data ?? []
+    const pending = pendingRes?.data ?? []
 
     let likedIds = new Set<string>()
-    if (uid) {
+    if (uid && approved.length > 0) {
       const { data: likes } = await supabase
         .from('post_likes')
         .select('post_id')
         .eq('user_id', uid)
-        .in('post_id', data.map(p => p.id))
+        .in('post_id', approved.map(p => p.id as string))
       likedIds = new Set((likes ?? []).map(l => l.post_id))
     }
 
-    setPosts(data.map(p => ({
-      ...p,
+    setPosts(approved.map(p => ({
+      ...(p as object),
       author: normalizeAuthor(p.author),
-      user_has_liked: likedIds.has(p.id),
-    })))
+      user_has_liked: likedIds.has(p.id as string),
+    } as Post)))
+
+    setMyPending(pending.map(p => ({
+      ...(p as object),
+      author: normalizeAuthor(p.author),
+      user_has_liked: false,
+    } as Post)))
+
     setLoading(false)
   }
 
@@ -256,6 +285,32 @@ export default function BlogFeed() {
           >
             {submitting ? 'Publicando...' : 'Publicar'}
           </button>
+        </div>
+      )}
+
+      {/* Posts propios pendientes de aprobación */}
+      {myPending.length > 0 && (
+        <div className="flex flex-col gap-2 mb-3">
+          {myPending.map(post => (
+            <div key={post.id} className="card overflow-hidden border border-amber-200">
+              <div className="px-4 py-2 bg-amber-50 flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-amber-600">En revisión — visible solo para ti</span>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Avatar name={post.author?.full_name || 'Jugador'} url={post.author?.avatar_url} size={7} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-slate-700 truncate">{post.author?.full_name || 'Jugador'}</p>
+                    <p className="text-[10px] text-slate-400">{formatTime(post.created_at)}</p>
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${CATEGORY_COLORS[post.category]}`}>
+                    {CATEGORY_LABELS[post.category]}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed">{post.content}</p>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
