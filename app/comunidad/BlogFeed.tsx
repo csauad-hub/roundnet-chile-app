@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { MessageSquare, Heart, Plus, Send, ChevronDown, ChevronUp, X, ImageVideo, AlertCircle } from 'lucide-react'
+import { MessageSquare, Heart, Plus, Send, ChevronDown, ChevronUp, X, Image, AlertCircle } from 'lucide-react'
 
 type PostCategory = 'tecnica' | 'general' | 'ayuda' | 'humor'
 
@@ -356,7 +356,7 @@ export default function BlogFeed() {
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-2 w-full border border-dashed border-slate-300 rounded-xl py-3 px-4 mb-4 text-sm text-slate-400 hover:border-blue-400 hover:text-blue-500 transition-colors"
             >
-              <ImageVideo size={18} />
+              <Image size={18} />
               Subir foto o video
             </button>
           )}
