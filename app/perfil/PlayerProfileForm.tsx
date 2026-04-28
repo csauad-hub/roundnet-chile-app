@@ -6,6 +6,7 @@ type Props = {
   profile: {
     id: string
     full_name: string | null
+    nickname: string | null
     city: string | null
     region: string | null
     instagram: string | null
@@ -26,6 +27,7 @@ export default function PlayerProfileForm({ profile }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     full_name: profile.full_name || '',
+    nickname: profile.nickname || '',
     city: profile.city || '',
     region: profile.region || '',
     instagram: profile.instagram || '',
@@ -42,6 +44,7 @@ export default function PlayerProfileForm({ profile }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         full_name: form.full_name || null,
+        nickname: form.nickname || null,
         city: form.city || null,
         region: form.region || null,
         instagram: form.instagram || null,
@@ -71,6 +74,21 @@ export default function PlayerProfileForm({ profile }: Props) {
         <p className="text-xs text-slate-400 mb-4">
           Esta información es opcional y controla cómo apareces en el directorio de jugadores.
         </p>
+
+        {/* Apodo */}
+        <div className="mb-3">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-1">
+            <User size={12} /> Apodo <span className="font-normal text-slate-400">(opcional)</span>
+          </label>
+          <input
+            type="text"
+            value={form.nickname}
+            onChange={e => setForm(f => ({ ...f, nickname: e.target.value }))}
+            placeholder="¿Cómo te llaman en la cancha?"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          <p className="text-[11px] text-slate-400 mt-1">Si tienes apodo, será el nombre que aparezca en el foro y el directorio.</p>
+        </div>
 
         {/* Nombre */}
         <div className="mb-3">

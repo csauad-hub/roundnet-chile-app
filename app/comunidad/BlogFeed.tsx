@@ -22,6 +22,7 @@ const CATEGORY_COLORS: Record<PostCategory, string> = {
 
 interface Author {
   full_name: string | null
+  nickname: string | null
   avatar_url: string | null
 }
 
@@ -107,7 +108,7 @@ export default function BlogFeed() {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, avatar_url')
+          .select('full_name, nickname, avatar_url')
           .eq('id', user.id)
           .single()
         setUserProfile(profile ?? null)
@@ -141,10 +142,10 @@ export default function BlogFeed() {
     if (allIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url')
+        .select('id, full_name, nickname, avatar_url')
         .in('id', allIds)
       for (const p of profiles ?? []) {
-        profileMap[p.id] = { full_name: p.full_name, avatar_url: p.avatar_url }
+        profileMap[p.id] = { full_name: p.full_name, nickname: p.nickname, avatar_url: p.avatar_url }
       }
     }
 
@@ -267,13 +268,17 @@ export default function BlogFeed() {
     if (cids.length > 0) {
       const { data: cProfiles } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url')
+        .select('id, full_name, nickname, avatar_url')
         .in('id', cids)
       for (const p of cProfiles ?? []) {
-        cProfileMap[p.id] = { full_name: p.full_name, avatar_url: p.avatar_url }
+        cProfileMap[p.id] = { full_name: p.full_name, nickname: p.nickname, avatar_url: p.avatar_url }
       }
     }
-    setComments(prev => ({ ...prev, [postId]: (commentData ?? []).map(c => ({ ...c, author: cProfileMap[c.author_id] ?? null })) }))
+    const mappedComments = (commentData ?? []).map(c => ({ ...c, author: cProfileMap[c.author_id] ?? null }))
+    setComments(prev => ({ ...prev, [postId]: mappedComments }))
+    // Sincroniza el contador local con la cantidad real de comentarios en DB
+    const realCount = mappedComments.length
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments_count: realCount } : p))
   }
 
   const handleComment = async (postId: string) => {
@@ -428,9 +433,9 @@ export default function BlogFeed() {
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Avatar name={post.author?.full_name || 'Jugador'} url={post.author?.avatar_url} size={7} />
+                  <Avatar name={post.author?.nickname || post.author?.full_name || 'Jugador'} url={post.author?.avatar_url} size={7} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-slate-700 truncate">{post.author?.full_name || 'Jugador'}</p>
+                    <p className="text-xs font-semibold text-slate-700 truncate">{post.author?.nickname || post.author?.full_name || 'Jugador'}</p>
                     <p className="text-[10px] text-slate-400">{formatTime(post.created_at)}</p>
                   </div>
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${CATEGORY_COLORS[post.category]}`}>
@@ -477,7 +482,7 @@ export default function BlogFeed() {
         <div className="flex flex-col gap-2.5">
           {filteredPosts.map(post => {
             const isExpanded = expandedPost === post.id
-            const authorName = post.author?.full_name || 'Jugador'
+            const authorName = post.author?.nickname || post.author?.full_name || 'Jugador'
             const postComments = comments[post.id] ?? []
             const isVideo = post.media_url && (post.media_url.includes('.mp4') || post.media_url.includes('.mov') || post.media_url.includes('.webm'))
 
@@ -543,7 +548,7 @@ export default function BlogFeed() {
                     ) : (
                       <div className="flex flex-col gap-3 mb-3">
                         {postComments.map(c => {
-                          const cName = c.author?.full_name || 'Jugador'
+                          const cName = c.author?.nickname || c.author?.full_name || 'Jugador'
                           return (
                             <div key={c.id} className="flex gap-2">
                               <Avatar name={cName} url={c.author?.avatar_url} size={6} />

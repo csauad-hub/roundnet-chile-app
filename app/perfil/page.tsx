@@ -19,7 +19,7 @@ export default async function PerfilPage() {
     .eq('id', user.id)
     .single()
 
-  const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuario'
+  const displayName = profile?.nickname || profile?.full_name || user.email?.split('@')[0] || 'Usuario'
   const isAdmin = profile?.role === 'admin'
   const joinDate = new Date(user.created_at).toLocaleDateString('es-CL', {
     year: 'numeric',
@@ -90,6 +90,7 @@ export default async function PerfilPage() {
         <PlayerProfileForm profile={{
           id: user.id,
           full_name: profile?.full_name || null,
+          nickname: profile?.nickname || null,
           city: profile?.city || null,
           region: profile?.region || null,
           instagram: profile?.instagram || null,

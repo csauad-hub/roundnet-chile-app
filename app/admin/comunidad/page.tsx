@@ -69,10 +69,10 @@ export default async function AdminComunidadPage({
   if (authorIds.length > 0) {
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, nickname')
       .in('id', authorIds)
     for (const p of profiles ?? []) {
-      authorMap[p.id] = p.full_name || 'Usuario'
+      authorMap[p.id] = p.nickname || p.full_name || 'Usuario'
     }
   }
 

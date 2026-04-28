@@ -8,6 +8,7 @@ create table if not exists public.profiles (
   id                   uuid primary key references auth.users(id) on delete cascade,
   username             text,
   full_name            text,
+  nickname             text,   -- apodo opcional; se muestra en lugar del nombre real cuando está definido
   avatar_url           text,
   city                 text,
   region               text,
@@ -18,6 +19,9 @@ create table if not exists public.profiles (
   created_at           timestamptz default now(),
   updated_at           timestamptz default now()
 );
+
+-- ► MIGRACIÓN para bases de datos existentes (ejecutar una sola vez en Supabase SQL Editor):
+-- alter table public.profiles add column if not exists nickname text;
 
 alter table public.profiles enable row level security;
 
@@ -44,6 +48,26 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- ── posts comments_count trigger ─────────────────────────────
+-- Mantiene posts.comments_count sincronizado automáticamente.
+-- ► Ejecutar en Supabase SQL Editor si la tabla posts ya existe.
+create or replace function public.handle_comment_count()
+returns trigger language plpgsql security definer as $$
+begin
+  if (TG_OP = 'INSERT') then
+    update public.posts set comments_count = comments_count + 1 where id = NEW.post_id;
+  elsif (TG_OP = 'DELETE') then
+    update public.posts set comments_count = greatest(comments_count - 1, 0) where id = OLD.post_id;
+  end if;
+  return null;
+end;
+$$;
+
+drop trigger if exists on_comment_inserted on public.post_comments;
+create trigger on_comment_inserted
+  after insert or delete on public.post_comments
+  for each row execute procedure public.handle_comment_count();
 
 -- ── tournaments ──────────────────────────────────────────────
 create table if not exists public.tournaments (

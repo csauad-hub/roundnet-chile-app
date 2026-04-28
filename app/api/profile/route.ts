@@ -36,6 +36,7 @@ export async function PATCH(request: Request) {
     .from('profiles')
     .update({
       full_name: (body.full_name as string) || null,
+      nickname: (body.nickname as string) || null,
       city: (body.city as string) || null,
       region: (body.region as string) || null,
       instagram: body.instagram ? (body.instagram as string).replace('@', '') : null,
@@ -63,6 +64,7 @@ export async function PATCH(request: Request) {
       .insert({
         id: user.id,
         full_name: (body.full_name as string) || null,
+        nickname: (body.nickname as string) || null,
         city: (body.city as string) || null,
         region: (body.region as string) || null,
         instagram: body.instagram ? (body.instagram as string).replace('@', '') : null,
