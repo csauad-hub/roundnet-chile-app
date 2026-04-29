@@ -36,7 +36,7 @@ export default async function TournamentDetailPage({
     admin.from('tournaments').select('*').eq('id', id).single(),
     admin
       .from('tournament_registrations')
-      .select('id, player1_id, player2_id, category, status, profiles!player1_id(full_name, avatar_url), profiles!player2_id(full_name, avatar_url)')
+      .select('id, player1_id, player2_id, category, status, player1:profiles!player1_id(full_name, avatar_url), player2:profiles!player2_id(full_name, avatar_url)')
       .eq('tournament_id', id)
       .eq('status', 'confirmed')
       .order('registered_at'),
@@ -187,12 +187,9 @@ export default async function TournamentDetailPage({
               </h2>
               <div className="card overflow-hidden">
                 {registrations.map((reg, i) => {
-                  const p1 = reg.profiles as unknown as { full_name: string | null; avatar_url: string | null }[] | null
-                  const p1data = Array.isArray(p1) ? p1[0] : p1
-                  const p2 = (reg as Record<string, unknown>)['profiles!player2_id'] as { full_name: string | null; avatar_url: string | null } | null
-
-                  const name1 = p1data?.full_name ?? 'Jugador'
-                  const name2 = p2?.full_name ?? 'Jugador'
+                  const r = reg as unknown as { player1: { full_name: string | null } | null; player2: { full_name: string | null } | null; id: string; category: string }
+                  const name1 = r.player1?.full_name ?? 'Jugador'
+                  const name2 = r.player2?.full_name ?? 'Jugador'
 
                   return (
                     <div

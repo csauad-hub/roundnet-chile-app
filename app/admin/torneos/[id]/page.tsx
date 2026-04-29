@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Check, X, Eye, Plus, Trash2, Trophy, Save, RefreshCw, Search } from 'lucide-react'
@@ -60,6 +60,7 @@ export default function AdminTorneoGestionPage() {
   // Player search for results
   const [searchQuery, setSearchQuery] = useState<Record<string, string>>({})
   const [searchResults, setSearchResults] = useState<Record<string, Profile[]>>({})
+  const searchTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const fetchTournament = useCallback(async () => {
     const { data } = await supabase.from('tournaments').select('name, status').eq('id', id).single()
@@ -180,14 +181,17 @@ export default function AdminTorneoGestionPage() {
     }])
   }
 
-  async function searchPlayers(key: string, q: string) {
+  function searchPlayers(key: string, q: string) {
+    clearTimeout(searchTimers.current[key])
     if (q.length < 2) { setSearchResults(prev => ({ ...prev, [key]: [] })); return }
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, full_name, avatar_url')
-      .ilike('full_name', `%${q}%`)
-      .limit(6)
-    setSearchResults(prev => ({ ...prev, [key]: data ?? [] }))
+    searchTimers.current[key] = setTimeout(async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .ilike('full_name', `%${q}%`)
+        .limit(6)
+      setSearchResults(prev => ({ ...prev, [key]: data ?? [] }))
+    }, 300)
   }
 
   function updateResult(idx: number, field: keyof Result, value: unknown) {

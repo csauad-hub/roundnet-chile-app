@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { X, Search, Upload, CheckCircle, AlertCircle, ImageIcon } from 'lucide-react'
 
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function InscripcionModal({ tournamentId, tournamentName, pricePerTeam, userId }: Props) {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState<'form' | 'success' | 'error'>('form')
   const [errorMsg, setErrorMsg] = useState('')
@@ -72,6 +72,15 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Solo se permiten imágenes (JPG, PNG, etc.)')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMsg('La imagen no puede superar los 5 MB')
+      return
+    }
+    setErrorMsg('')
     setProofFile(file)
     const reader = new FileReader()
     reader.onload = () => setProofPreview(reader.result as string)

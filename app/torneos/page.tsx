@@ -83,11 +83,15 @@ export default async function TorneosPage({
                   </div>
                   {t.description && <p className="text-sm text-slate-400 mb-4">{t.description}</p>}
                   <div className="flex items-center gap-3">
+                    <Link href={`/torneos/${t.id}`}
+                      className="btn-primary flex items-center gap-1.5 text-xs px-4 py-2">
+                      Ver detalles
+                    </Link>
                     {t.fwango_url && (
                       <a href={t.fwango_url} target="_blank" rel="noopener noreferrer"
-                        className="btn-primary flex items-center gap-1.5 text-xs px-4 py-2">
+                        className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
                         <ExternalLink size={12} />
-                        Inscribirse en Fwango
+                        Fwango
                       </a>
                     )}
                     {t.price_per_team && (
@@ -120,7 +124,7 @@ export default async function TorneosPage({
             </div>
             <div className="px-4 flex flex-col gap-2">
               {past.map(t => (
-                <div key={t.id} className="card flex items-center justify-between px-4 py-3">
+                <Link key={t.id} href={`/torneos/${t.id}`} className="card flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors">
                   <div>
                     <p className="text-sm font-semibold text-slate-700">{t.name}</p>
                     <p className="text-xs text-slate-400">
@@ -130,7 +134,7 @@ export default async function TorneosPage({
                   <span className={cn('badge', statusStyle[t.status] ?? statusStyle.finished)}>
                     {statusLabel[t.status] ?? t.status}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
 

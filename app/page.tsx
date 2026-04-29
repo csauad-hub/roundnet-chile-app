@@ -45,12 +45,10 @@ export default async function HomePage() {
                 {new Date(torneo.date).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             )}
-            {torneo.fwango_url && (
-              <a href={torneo.fwango_url} target="_blank" rel="noopener noreferrer"
-                className="inline-block mt-4 bg-white text-blue-700 font-display font-bold text-xs px-5 py-2.5 rounded-full shadow-md">
-                Ver detalles →
-              </a>
-            )}
+            <Link href={`/torneos/${torneo.id}`}
+              className="inline-block mt-4 bg-white text-blue-700 font-display font-bold text-xs px-5 py-2.5 rounded-full shadow-md">
+              Ver detalles →
+            </Link>
           </div>
         ) : (
           <div className="mx-4 mt-4 bg-gradient-to-br from-slate-600 to-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-lg">
