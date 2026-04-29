@@ -6,35 +6,30 @@ import { X, Search, Upload, CheckCircle, AlertCircle, ImageIcon } from 'lucide-r
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null }
 
-const CATEGORIES = ['Varones', 'Damas'] as const
-
 interface Props {
   tournamentId: string
   tournamentName: string
+  tournamentCategory: string | null
   pricePerTeam: number | null
   userId: string
 }
 
-export default function InscripcionModal({ tournamentId, tournamentName, pricePerTeam, userId }: Props) {
+export default function InscripcionModal({ tournamentId, tournamentName, tournamentCategory, pricePerTeam, userId }: Props) {
   const supabase = useMemo(() => createClient(), [])
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState<'form' | 'success' | 'error'>('form')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Mis datos
   const [myProfile, setMyProfile] = useState<Profile | null>(null)
 
-  // Pareja
   const [partnerQuery, setPartnerQuery] = useState('')
   const [partnerResults, setPartnerResults] = useState<Profile[]>([])
   const [selectedPartner, setSelectedPartner] = useState<Profile | null>(null)
   const [searching, setSearching] = useState(false)
 
-  // Formulario
-  const [category, setCategory] = useState<'Varones' | 'Damas'>('Varones')
+  const [teamName, setTeamName] = useState('')
   const [notes, setNotes] = useState('')
 
-  // Comprobante
   const [proofFile, setProofFile] = useState<File | null>(null)
   const [proofPreview, setProofPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -92,7 +87,7 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
     setPartnerQuery('')
     setPartnerResults([])
     setSelectedPartner(null)
-    setCategory('Varones')
+    setTeamName('')
     setNotes('')
     setProofFile(null)
     setProofPreview(null)
@@ -107,7 +102,6 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
     setErrorMsg('')
 
     try {
-      // 1. Subir comprobante a Supabase Storage
       setUploading(true)
       const ext = proofFile.name.split('.').pop() ?? 'jpg'
       const path = `${userId}/${tournamentId}/${Date.now()}.${ext}`
@@ -118,14 +112,14 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
       if (uploadError) throw new Error('Error al subir comprobante: ' + uploadError.message)
       setUploading(false)
 
-      // 2. Crear inscripción
       const res = await fetch('/api/inscripcion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tournament_id: tournamentId,
           player2_id: selectedPartner.id,
-          category,
+          category: tournamentCategory ?? 'Open',
+          team_name: teamName.trim() || null,
           payment_proof: path,
           notes: notes || null,
         }),
@@ -155,7 +149,7 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
 
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col">
+          <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl h-[92vh] sm:h-auto sm:max-h-[92vh] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
               <div>
@@ -171,7 +165,7 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-5">
 
               {step === 'success' ? (
                 <div className="flex flex-col items-center text-center py-6 gap-4">
@@ -286,25 +280,36 @@ export default function InscripcionModal({ tournamentId, tournamentName, pricePe
                     )}
                   </section>
 
-                  {/* Categoría */}
+                  {/* Nombre de equipo */}
                   <section>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Categoría</p>
-                    <div className="flex gap-2">
-                      {CATEGORIES.map(cat => (
-                        <button
-                          key={cat}
-                          onClick={() => setCategory(cat)}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
-                            category === cat
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">
+                      Nombre de equipo <span className="font-normal">(opcional)</span>
+                    </p>
+                    <input
+                      type="text"
+                      value={teamName}
+                      onChange={e => setTeamName(e.target.value)}
+                      placeholder="Ej: Los Cóndores"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-300"
+                    />
                   </section>
+
+                  {/* Categoría - solo se muestra si el torneo no tiene categoría definida */}
+                  {tournamentCategory && (
+                    <section>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Categoría</p>
+                      <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-4 py-3">
+                        <span className={`text-sm font-semibold ${
+                          tournamentCategory === 'Damas' ? 'text-pink-600' :
+                          tournamentCategory === 'Open' ? 'text-purple-600' :
+                          'text-blue-600'
+                        }`}>
+                          {tournamentCategory}
+                        </span>
+                        <span className="text-xs text-slate-400">· definido por el torneo</span>
+                      </div>
+                    </section>
+                  )}
 
                   {/* Comprobante de pago */}
                   <section>

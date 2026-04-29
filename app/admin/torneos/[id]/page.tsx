@@ -14,6 +14,7 @@ type Registration = {
   category: string
   status: string
   registered_at: string
+  team_name: string | null
   notes: string | null
   payment_proof: string | null
   player1: Profile | null
@@ -92,7 +93,7 @@ export default function AdminTorneoGestionPage() {
     const { data } = await supabase
       .from('tournament_registrations')
       .select(`
-        id, player1_id, player2_id, category, status, registered_at, notes, payment_proof,
+        id, player1_id, player2_id, category, status, registered_at, team_name, notes, payment_proof,
         player1:profiles!player1_id(id, full_name, avatar_url),
         player2:profiles!player2_id(id, full_name, avatar_url)
       `)
@@ -308,6 +309,9 @@ export default function AdminTorneoGestionPage() {
                       <p className="text-sm font-semibold text-white">
                         {reg.player1?.full_name ?? '—'} & {reg.player2?.full_name ?? '—'}
                       </p>
+                      {reg.team_name && (
+                        <p className="text-xs text-[#00E5FF] font-medium mt-0.5">"{reg.team_name}"</p>
+                      )}
                       <p className="text-xs text-gray-500 mt-0.5">
                         {new Date(reg.registered_at).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </p>

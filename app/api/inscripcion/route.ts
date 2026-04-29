@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
   const body = await req.json()
-  const { tournament_id, player2_id, category, payment_proof, notes } = body
+  const { tournament_id, player2_id, category, team_name, payment_proof, notes } = body
 
   if (!tournament_id || !player2_id || !category) {
     return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
@@ -73,6 +73,7 @@ export async function POST(req: Request) {
       player1_id: user.id,
       player2_id,
       category,
+      team_name: team_name ?? null,
       payment_proof: payment_proof ?? null,
       notes: notes ?? null,
       status: 'pending',

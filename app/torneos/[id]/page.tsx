@@ -228,6 +228,7 @@ export default async function TournamentDetailPage({
             <InscripcionModal
               tournamentId={t.id}
               tournamentName={t.name}
+              tournamentCategory={t.category ?? null}
               pricePerTeam={t.price_per_team}
               userId={user.id}
             />
